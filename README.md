@@ -19,18 +19,13 @@ frp is an open source project with its ongoing development made possible entirel
   </a>
 </p>
 <p align="center">
-  <a href="https://workos.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=frp&utm_source=github" target="_blank">
-    <img width="420px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_workos.png">
-  </a>
-</p>
-<p align="center">
   <a href="https://github.com/daytonaio/daytona" target="_blank">
     <img width="420px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_daytona.png">
   </a>
 </p>
 <p align="center">
-  <a href="https://github.com/beclab/terminus" target="_blank">
-    <img width="420px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_terminusos.jpeg">
+  <a href="https://github.com/beclab/Olares" target="_blank">
+    <img width="420px" src="https://raw.githubusercontent.com/fatedier/frp/dev/doc/pic/sponsor_olares.jpeg">
   </a>
 </p>
 <!--gold sponsors end-->
@@ -97,7 +92,12 @@ frp also offers a P2P connect mode.
     * [Client Plugins](#client-plugins)
     * [Server Manage Plugins](#server-manage-plugins)
     * [SSH Tunnel Gateway](#ssh-tunnel-gateway)
-* [Releated Projects](#releated-projects)
+    * [Virtual Network (VirtualNet)](#virtual-network-virtualnet)
+* [Feature Gates](#feature-gates)
+    * [Available Feature Gates](#available-feature-gates)
+    * [Enabling Feature Gates](#enabling-feature-gates)
+    * [Feature Lifecycle](#feature-lifecycle)
+* [Related Projects](#related-projects)
 * [Contributing](#contributing)
 * [Donation](#donation)
     * [GitHub Sponsors](#github-sponsors)
@@ -612,6 +612,21 @@ When specifying `auth.method = "token"` in `frpc.toml` and `frps.toml` - token b
 
 Make sure to specify the same `auth.token` in `frps.toml` and `frpc.toml` for frpc to pass frps validation
 
+##### Token Source
+
+frp supports reading authentication tokens from external sources using the `tokenSource` configuration. Currently, file-based token source is supported.
+
+**File-based token source:**
+
+```toml
+# frpc.toml
+auth.method = "token"
+auth.tokenSource.type = "file"
+auth.tokenSource.file.path = "/path/to/token/file"
+```
+
+The token will be read from the specified file at startup. This is useful for scenarios where tokens are managed by external systems or need to be kept separate from configuration files for security reasons.
+
 #### OIDC Authentication
 
 When specifying `auth.method = "oidc"` in `frpc.toml` and `frps.toml` - OIDC based authentication will be used.
@@ -1025,7 +1040,7 @@ You can get user's real IP from HTTP request headers `X-Forwarded-For`.
 
 #### Proxy Protocol
 
-frp supports Proxy Protocol to send user's real IP to local services. It support all types except UDP.
+frp supports Proxy Protocol to send user's real IP to local services.
 
 Here is an example for https service:
 
@@ -1260,7 +1275,40 @@ frpc tcp --proxy_name "test-tcp" --local_ip 127.0.0.1 --local_port 8080 --remote
 
 Please refer to this [document](/doc/ssh_tunnel_gateway.md) for more information.
 
-## Releated Projects
+### Virtual Network (VirtualNet)
+
+*Alpha feature added in v0.62.0*
+
+The VirtualNet feature enables frp to create and manage virtual network connections between clients and visitors through a TUN interface. This allows for IP-level routing between machines, extending frp beyond simple port forwarding to support full network connectivity.
+
+For detailed information about configuration and usage, please refer to the [VirtualNet documentation](/doc/virtual_net.md).
+
+## Feature Gates
+
+frp supports feature gates to enable or disable experimental features. This allows users to try out new features before they're considered stable.
+
+### Available Feature Gates
+
+| Name | Stage | Default | Description |
+|------|-------|---------|-------------|
+| VirtualNet | ALPHA | false | Virtual network capabilities for frp |
+
+### Enabling Feature Gates
+
+To enable an experimental feature, add the feature gate to your configuration:
+
+```toml
+featureGates = { VirtualNet = true }
+```
+
+### Feature Lifecycle
+
+Features typically go through three stages:
+1. **ALPHA**: Disabled by default, may be unstable
+2. **BETA**: May be enabled by default, more stable but still evolving
+3. **GA (Generally Available)**: Enabled by default, ready for production use
+
+## Related Projects
 
 * [gofrp/plugin](https://github.com/gofrp/plugin) - A repository for frp plugins that contains a variety of plugins implemented based on the frp extension mechanism, meeting the customization needs of different scenarios.
 * [gofrp/tiny-frpc](https://github.com/gofrp/tiny-frpc) - A lightweight version of the frp client (around 3.5MB at minimum) implemented using the ssh protocol, supporting some of the most commonly used features, suitable for devices with limited resources.
