@@ -1,8 +1,9 @@
 ## Features
 
-* HTTPS proxies now support load balancing groups. Multiple HTTPS proxies can be configured with the same `loadBalancer.group` and `loadBalancer.groupKey` to share the same custom domain and distribute traffic across multiple backend services, similar to the existing TCP and HTTP load balancing capabilities.
-* Individual frpc proxies and visitors now accept an `enabled` flag (defaults to true), letting you disable specific entries without relying on the global `start` list—disabled blocks are skipped when client configs load.
+* `transport.wireProtocol = "v2"` now also applies to UDP-based proxy payloads, including ordinary UDP and SUDP, so their payload framing is consistent with the selected wire protocol.
+* Improved SUDP compatibility during mixed `transport.wireProtocol` deployments, allowing frps to bridge payloads between v1/default and v2 SUDP clients.
+* XTCP work connection `NatHoleSid` messages now follow the selected `transport.wireProtocol`.
 
-## Improvements
+## Compatibility Notes
 
-* **VirtualNet**: Implemented intelligent reconnection with exponential backoff. When connection errors occur repeatedly, the reconnect interval increases from 60s to 300s (max), reducing unnecessary reconnection attempts. Normal disconnections still reconnect quickly at 10s intervals.
+* When enabling `transport.wireProtocol = "v2"` for SUDP, upgrade both the proxy and visitor frpc instances first, or keep them on `v1` until both sides are upgraded.
